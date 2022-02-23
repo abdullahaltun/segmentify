@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="product.css">
+        <title>Segmentfy project</title>
+        <script src="jquery/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
+        <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
+    </head>
+    <body>
+        <div style="position: relative">
+            <div id="popup" style="padding: 40px">
+                <img src = "https://img.icons8.com/color/344/ok.png" style="width: 30px" />
+                <div style="margin-left: 20px" >
+                    <div>Ürün Sepetinize Eklendi</div>
+                    <div style="color: cornflowerblue" >Sepete git</div>
+                </div>
+                <div class="close-popup">
+                    <img id="close-popup-icon" src = "https://img.icons8.com/office/344/xbox-x.png" />
+                </div>
+            </div>
+            <div class="container">
+                <div class ="title" >
+                    Sizin için Seçtiklerimiz
+                </div>
+                <div>
+                    <div class="menu">
+                        <div class="container-alt">
+                            <div>
+                                <ul id="recommended"></ul>
+                            </div>
+                            <div class="display" id="display1">
+                                <div id="manipulation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="slick/slick.min.js"></script>
+        <script>
+        function readTextFile(file, callback) {
+            const rawFile = new XMLHttpRequest()
+            rawFile.overrideMimeType('application/json')
+            rawFile.open('GET', file, true)
+            rawFile.onreadystatechange = function() {
+                if (rawFile.readyState === 4 && rawFile.status === 200) {
+                    callback(rawFile.responseText)
+                }
+            }
+            rawFile.send(null)
+        }
+        $(function() {
+            const closePopup = document.getElementById('close-popup-icon')
+            closePopup.addEventListener('click', function () {
+                const popup = document.getElementById('popup')
+                popup.classList.remove('opened')
+            })
+            readTextFile('product-list.json', function(text) {
+                const data = JSON.parse(text)
+                let isFirstAction = true
+                const userCategories = data.responses[0][0].params.userCategories
+                userCategories.forEach(category => {
+                    const recommended = document.getElementById('recommended')
+                    const titleElem = document.createElement('li')
+                    titleElem.innerText = category.includes('>') ? category.split('>')[1] : category
+                    titleElem.id = category
+
+                    titleElem.addEventListener('click', function (event) {
+                        const idSelector = event.target.id
+                        $('li').removeClass('selected-li')
+                        document.getElementById(idSelector).classList.add('selected-li')
+                        // henüz yüklenmemiş olduğundan hata veriyordu böyle bir kontrol ekledim.
+                        if (!isFirstAction) {
+                            $('#manipulation').slick('unslick')
+                        }
+
+                        $('#manipulation').empty()
+
+                        const products = data.responses[0][0].params.recommendedProducts[event.target.id]
+                        products.forEach(product => {
+                            const nameElem = document.getElementById('manipulation')
+                            const createDiv = document.createElement('div')
+
+                            createDiv.className = 'div-group'
+                            nameElem.appendChild(createDiv)
+
+                            const image = document.createElement('img')
+                            const name = document.createElement('div')
+                            const price = document.createElement('div')
+                            name.className = 'detailProduct'
+                            price.className = 'price'
+                            const shipping = document.createElement('div')
+                            shipping.className = 'shipping'
+                            const shippingImage = document.createElement('img')
+                            const shippingDiv = document.createElement('div')
+                            const addToChart = document.createElement('div')
+                            addToChart.id = 'add-chart'
+                            addToChart.innerText = 'Sepete Ekle'
+
+                            addToChart.addEventListener('click', function () {
+                                const popup = document.getElementById('popup')
+                                popup.classList.add('opened')
+                            })
+
+                            image.src = product.image
+                            name.innerText = product.name
+                            price.innerText = product.priceText
+
+                            if (product.params.shippingFee === 'FREE') {
+                                shippingImage.src = 'img/icons8-shipped-48.png'
+                                shippingImage.className = 'shipping-image'
+                                shippingDiv.innerText = 'Ücretsiz Kargo'
+                                shipping.appendChild(shippingImage)
+                                shipping.appendChild(shippingDiv)
+                            }
+
+                            createDiv.appendChild(image)
+                            createDiv.appendChild(name)
+                            createDiv.appendChild(price)
+                            createDiv.appendChild(shipping)
+                            createDiv.appendChild(addToChart)
+
+                        })
+                        $('#manipulation').slick({
+                            infinite: true,
+                            slidesToShow: 4,
+                            slidesToScroll: 4
+                        })
+
+                    })
+                    recommended.appendChild(titleElem)
+
+                })
+                $(document).ready(function() {
+                    $('#manipulation').ready(function() {
+                        $('li:first-child').trigger('click')
+                        isFirstAction = false
+                    })
+                })
+            })
+        })
+    </script>
+    </body>
+</html>
