@@ -4,21 +4,23 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <link rel="stylesheet" href="product.css">
-        <title>Segmentfy project</title>
+        <title>Segmentify project</title>
         <script src="jquery/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js"></script>
         <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
         <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
     </head>
     <body>
         <div style="position: relative">
             <div id="popup" style="padding: 40px">
-                <img src = "https://img.icons8.com/color/344/ok.png" style="width: 30px" />
+                <img class="lazy" src="./img/24559847.jpg" data-src="https://img.icons8.com/color/344/ok.png" style="width: 30px" />
                 <div style="margin-left: 20px" >
                     <div>Ürün Sepetinize Eklendi</div>
                     <div style="color: cornflowerblue" >Sepete git</div>
                 </div>
                 <div class="close-popup">
-                    <img id="close-popup-icon" src = "https://img.icons8.com/office/344/xbox-x.png" />
+                    <img id="close-popup-icon" class="lazy" src="https://img.icons8.com/office/344/xbox-x.png" />
                 </div>
             </div>
             <div class="container">
@@ -39,8 +41,6 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-        <script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
         <script type="text/javascript" src="slick/slick.min.js"></script>
         <script>
         function readTextFile(file, callback) {
@@ -90,6 +90,8 @@
                             nameElem.appendChild(createDiv)
 
                             const image = document.createElement('img')
+                            image.classList.add('lazy')
+
                             const name = document.createElement('div')
                             const price = document.createElement('div')
                             name.className = 'detailProduct'
@@ -107,7 +109,8 @@
                                 popup.classList.add('opened')
                             })
 
-                            image.src = product.image
+                            image.src = './img/24559847.jpg'
+                            image.setAttribute('data-src', product.image)
                             name.innerText = product.name
                             price.innerText = product.priceText
 
@@ -131,7 +134,10 @@
                             slidesToShow: 4,
                             slidesToScroll: 4
                         })
-
+                        $('#manipulation').on('beforeChange', function(event, slick, direction){
+                            $(".lazy").Lazy()
+                        })
+                        $(".lazy").Lazy()
                     })
                     recommended.appendChild(titleElem)
 
@@ -140,6 +146,7 @@
                     $('#manipulation').ready(function() {
                         $('li:first-child').trigger('click')
                         isFirstAction = false
+                        $(".lazy").Lazy()
                     })
                 })
             })
